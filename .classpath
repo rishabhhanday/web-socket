@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="G:/torrent/The Turkey Bowl (2019) [WEBRip] [720p] [YTS.LT]/json-simple-1.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javax.json-api-1.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/json-simple-1.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javax.json-1.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
