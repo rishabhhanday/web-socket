@@ -2,6 +2,13 @@
 public class ChatMessage {
 private String userName;
 private String message;
+private String reciever;
+public String getReciever() {
+	return reciever;
+}
+public void setReciever(String reciever) {
+	this.reciever = reciever;
+}
 public String getUserName() {
 	return userName;
 }

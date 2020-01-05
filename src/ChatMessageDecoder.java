@@ -28,8 +28,16 @@ public class ChatMessageDecoder implements Decoder.Text<ChatMessage>{
 	public ChatMessage decode(String message) throws DecodeException {
 		System.out.println("in decode");
 		ChatMessage chatMessage= new ChatMessage();
+		try {
+		chatMessage.setReciever((Json.createReader(new StringReader(message)).readObject()).getString("reciever"));
 		chatMessage.setMessage((Json.createReader(new StringReader(message)).readObject()).getString("message"));
 		return chatMessage;
+		}
+		catch(Exception ex) {
+			chatMessage.setMessage((Json.createReader(new StringReader(message)).readObject()).getString("message"));
+			return chatMessage;
+		}
+		
 	}
 
 	

@@ -38,12 +38,22 @@ public void handleMessage(ChatMessage incomingMessage,Session userSession)throws
 		outgoingMessage.setMessage(incomingMessage.getMessage());
 		
 	}
+	if(incomingMessage.getReciever()=="")
 	broadcast(outgoingMessage);
+	else
+		unicast(outgoingMessage);
 }
 
 @OnClose
 public void handleClose(Session userSession) {
 	chatroomUsers.remove(userSession);
+	
+}
+
+@OnError
+public void onError(Session session, Throwable thr) {
+	System.out.println("exception is ");
+	thr.printStackTrace();
 	
 }
 
@@ -53,10 +63,14 @@ public void broadcast(ChatMessage outgoingMessage) throws IOException, EncodeExc
 		
 	}
 }
-@OnError
-public void onError(Session session, Throwable thr) {
-	System.out.println("exception is ");
-	thr.printStackTrace();
+public void unicast(ChatMessage outgoingMessage) throws IOException, EncodeException {
+	for(Session recieverSession : chatroomUsers) {
+		String username = (String)recieverSession.getUserProperties().get("username");
+		if(username.equals(outgoingMessage.getReciever())) {
+			recieverSession.getBasicRemote().sendObject(outgoingMessage);
+		}
+		
+	}
 	
 }
 
