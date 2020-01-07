@@ -6,40 +6,54 @@
 </head>
 <body>
 <p id="demo"></p>
-<textarea id="messages" rows="10" cols="55"></textarea><br>
-Message <input id="message" type="text" size="50" />
-<input type="button" value="send to all" onclick="sendToAll()" /><br>
-Name of reciever<input type ="text" size="30" id="reciever" />
-<input type="button" value="send to one person" onclick="send()" />
+<textarea id="messages" rows="10" cols="55"></textarea>
+<input id="message" type="text" size="50" />
+<input type="button" value="send" onclick="send()" />
+<input type="button" value="close" onclick="closeCon()" />
+<input type="button" value="connect" onclick="connect()" />
 
 <script type="text/javascript">
-var webSocket = new WebSocket('ws://localhost:8089/WebSocket/chatServerEndpoint');
-webSocket.onmessage= function processMessage(chatMessage){
-	var json = JSON.parse(chatMessage.data);
-	document.getElementById('messages').value += json.name +': '+json.message +'\n';
+var webSocket = null;
+function connect(){
 	
+	 webSocket = new WebSocket('ws://localhost:8089/WebSocket/chatServerEndpoint');
+	 webSocket.onmessage= function processMessage(chatMessage){
+			var json = JSON.parse(chatMessage.data);
+			document.getElementById('messages').value += json.name +': '+json.message +'\n';
+			
+		};
+	 webSocket.onclose = function(e) {
+		    console.log('Socket is closed. Reconnect will be attempted in 10 second.', e.reason);
+		    setTimeout(function() {
+		      connect();
+		    }, 10000);
+		  };
+
+		  webSocket.onerror = function(err) {
+		    console.error('Socket encountered error: ', err.message, 'Closing socket');
+		    ws.close();
+		  };
+	 
 }
 
-function sendToAll(){
+
+
+function send(){
 	var message  = document.getElementById('message');
 	var myJson =  JSON.stringify({'message' : message.value});
 	document.getElementById("demo").innerHTML = myJson;
 	webSocket.send(myJson);
 	message.value = "";	
+	
 }
-function send(){
-	var message  = document.getElementById('message');
-	var reciever  = document.getElementById('reciever');
-	var myJson =  JSON.stringify({'message' : message.value,'reciever':reciever.value});
-	document.getElementById("demo").innerHTML = myJson;
-	webSocket.send(myJson);
-	message.value = "";	
+function closeCon(){
+	
+	webSocket.close();
 }
 
-window.onbeforeunload =function(){
-	websocket.onclose =function(){};
-	websocket.close();
-};
+
+
+
 </script>
 </body>
 </html>

@@ -1,14 +1,21 @@
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.websocket.CloseReason;
+import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 @ServerEndpoint(value="/chatServerEndpoint", encoders= { ChatMessageEncoder.class }, decoders= { ChatMessageDecoder.class })
@@ -38,23 +45,12 @@ public void handleMessage(ChatMessage incomingMessage,Session userSession)throws
 		outgoingMessage.setMessage(incomingMessage.getMessage());
 		
 	}
-	if(incomingMessage.getReciever()=="")
 	broadcast(outgoingMessage);
-	else
-		unicast(outgoingMessage);
 }
 
 @OnClose
-public void handleClose(Session userSession) {
-	chatroomUsers.remove(userSession);
-	
-}
-
-@OnError
-public void onError(Session session, Throwable thr) {
-	System.out.println("exception is ");
-	thr.printStackTrace();
-	
+public void handleClose(Session userSession,CloseReason cr,@PathParam("value") String value){
+	System.out.println(cr.getReasonPhrase());
 }
 
 public void broadcast(ChatMessage outgoingMessage) throws IOException, EncodeException {
@@ -63,14 +59,10 @@ public void broadcast(ChatMessage outgoingMessage) throws IOException, EncodeExc
 		
 	}
 }
-public void unicast(ChatMessage outgoingMessage) throws IOException, EncodeException {
-	for(Session recieverSession : chatroomUsers) {
-		String username = (String)recieverSession.getUserProperties().get("username");
-		if(username.equals(outgoingMessage.getReciever())) {
-			recieverSession.getBasicRemote().sendObject(outgoingMessage);
-		}
-		
-	}
+@OnError
+public void onError(Session session, Throwable thr) {
+	System.out.println("exception is ");
+	thr.printStackTrace();
 	
 }
 
